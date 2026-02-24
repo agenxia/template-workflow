@@ -1,0 +1,17 @@
+{
+  "name": "{{AGENT_NAME_SLUG}}",
+  "version": "1.0.0",
+  "description": "{{AGENT_DESCRIPTION}}",
+  "main": "api/status.js",
+  "scripts": {
+    "dev": "vercel dev",
+    "build": "echo 'No build step required'",
+    "start": "node api/status.js"
+  },
+  "dependencies": {
+    "uuid": "^9.0.1"
+  },
+  "engines": {
+    "node": "18.x"
+  }
+}

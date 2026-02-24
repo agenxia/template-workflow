@@ -1,0 +1,22 @@
+{
+  "name": "Workflow Agent",
+  "description": "Advanced agent with visual workflow engine, triggers, and automated task execution",
+  "type": "template",
+  "complexity": "advanced",
+  "features": [
+    "Visual workflow builder",
+    "HTTP triggers",
+    "Conditional logic",
+    "Multi-step automation",
+    "Data transformation",
+    "Error handling & retry"
+  ],
+  "env_vars": [
+    "API_VERSION",
+    "NODE_ENV",
+    "AGENT_NAME",
+    "WORKFLOW_TIMEOUT",
+    "MAX_RETRIES"
+  ],
+  "icon": "⚡"
+}

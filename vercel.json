@@ -1,0 +1,13 @@
+{
+  "functions": {
+    "api/**/*.js": {
+      "runtime": "@vercel/node@3"
+    }
+  },
+  "env": {
+    "API_VERSION": "{{API_VERSION}}",
+    "AGENT_NAME": "{{AGENT_NAME}}",
+    "WORKFLOW_TIMEOUT": "300000",
+    "MAX_RETRIES": "3"
+  }
+}
