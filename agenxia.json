@@ -12,9 +12,10 @@
     "Error handling & retry"
   ],
   "env_vars": [
-    "API_VERSION",
-    "NODE_ENV",
     "AGENT_NAME",
+    "AGENT_ID",
+    "PLATFORM_URL",
+    "PORT",
     "WORKFLOW_TIMEOUT",
     "MAX_RETRIES"
   ],
