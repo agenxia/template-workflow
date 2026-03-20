@@ -119,9 +119,36 @@ async function registerApiRoutes(app) {
 }
 
 // ---------------------------------------------------------------------------
-// Agent card
+// Agent card (enriched via lib/agent-card.js)
 // ---------------------------------------------------------------------------
-function loadAgentCard() {
+let _generateAgentCard;
+let _generateDocsHtml;
+
+async function loadAgentCardModule() {
+  try {
+    const mod = await import(join(__dirname, 'lib', 'agent-card.js'));
+    _generateAgentCard = mod.generateAgentCard;
+  } catch {
+    // Fallback: return raw agenxia.json
+    _generateAgentCard = null;
+  }
+}
+
+async function loadDocsModule() {
+  try {
+    const mod = await import(join(__dirname, 'lib', 'docs.js'));
+    _generateDocsHtml = mod.generateDocsHtml;
+  } catch {
+    _generateDocsHtml = null;
+  }
+}
+
+function getAgentCard() {
+  if (_generateAgentCard) {
+    const deployUrl = process.env.AGENT_URL || process.env.DEPLOY_URL || '';
+    return _generateAgentCard({ rootDir: __dirname, deployUrl: deployUrl || undefined });
+  }
+  // Fallback: raw agenxia.json
   try {
     const raw = readFileSync(join(__dirname, 'agenxia.json'), 'utf-8');
     return JSON.parse(raw);
@@ -156,6 +183,10 @@ function startHeartbeat() {
 // ---------------------------------------------------------------------------
 const app = Fastify({ logger: true, bodyLimit: 10 * 1024 * 1024 });
 
+// Load optional modules
+await loadAgentCardModule();
+await loadDocsModule();
+
 // CORS
 app.addHook('onRequest', (request, reply, done) => {
   reply.header('Access-Control-Allow-Origin', '*');
@@ -172,7 +203,19 @@ app.get('/health', async () => ({
   timestamp: new Date().toISOString(),
 }));
 
-app.get('/.well-known/agent-card.json', async () => loadAgentCard());
+app.get('/.well-known/agent-card.json', async () => getAgentCard());
+
+app.get('/docs', async (request, reply) => {
+  if (_generateDocsHtml) {
+    const card = getAgentCard();
+    const baseUrl = process.env.AGENT_URL || process.env.DEPLOY_URL || `http://localhost:${PORT}`;
+    const html = _generateDocsHtml(card, baseUrl);
+    reply.type('text/html').send(html);
+  } else {
+    // Fallback: redirect to agent-card JSON
+    reply.redirect('/.well-known/agent-card.json');
+  }
+});
 
 // API routes
 await registerApiRoutes(app);
