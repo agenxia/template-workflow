@@ -1,81 +1,41 @@
 {
-  "name": "Workflow Agent",
-  "description": "Advanced agent with visual workflow engine, triggers, and automated task execution",
-  "type": "template",
-  "complexity": "advanced",
-  "features": [
-    "Visual workflow builder",
-    "HTTP triggers",
-    "Conditional logic",
-    "Multi-step automation",
-    "Data transformation",
-    "Error handling & retry"
-  ],
-  "env_vars": [
-    "AGENT_NAME",
-    "AGENT_ID",
-    "PLATFORM_URL",
-    "PORT",
-    "WORKFLOW_TIMEOUT",
-    "MAX_RETRIES",
-    "LLM_API_KEY",
-    "LLM_API_URL"
-  ],
-  "icon": "⚡",
+  "name": "{{AGENT_NAME}}",
+  "version": "1.0.0",
+  "description": "{{AGENT_DESCRIPTION}}",
+  "type": "agent",
   "config": {
-    "system_prompt": "You are {{AGENT_NAME}}. {{AGENT_DESCRIPTION}}",
+    "system_prompt": "You are {{AGENT_NAME}}, a workflow orchestration agent.",
     "model": "llama-3.3-70b",
-    "temperature": 0.7,
+    "temperature": 0.3,
     "max_tokens": 4096
+  },
+  "env_vars": ["LLM_API_URL", "LLM_API_KEY"],
+  "ports": {
+    "inputs": [
+      { "id": "input", "label": "Input", "type": "json" },
+      { "id": "step_override", "label": "Step Override", "type": "text" }
+    ],
+    "outputs": [
+      { "id": "output", "label": "Output", "type": "json" },
+      { "id": "steps", "label": "Steps", "type": "json" }
+    ]
   },
   "methods": [
     {
-      "name": "execute",
-      "description": "Execute the workflow with given input",
+      "name": "process",
+      "description": "Execute workflow with input data",
       "params": {
-        "input": {
-          "type": "object",
-          "required": true,
-          "description": "Workflow input data"
-        }
+        "input": { "type": "object", "from_port": "input" },
+        "step_override": { "type": "string", "from_port": "step_override" }
       },
       "returns": {
-        "output": {
-          "type": "object",
-          "description": "Workflow execution result"
-        },
-        "steps": {
-          "type": "array",
-          "description": "Executed step details"
-        }
+        "output": { "type": "object", "to_port": "output" },
+        "steps": { "type": "array", "to_port": "steps" }
       }
     }
   ],
-  "api": [
-    {
-      "method": "GET",
-      "path": "/health",
-      "description": "Health check"
-    },
-    {
-      "method": "GET",
-      "path": "/.well-known/agent-card.json",
-      "description": "Agent discovery card"
-    },
-    {
-      "method": "GET",
-      "path": "/docs",
-      "description": "API documentation (HTML)"
-    },
-    {
-      "method": "POST",
-      "path": "/api/a2a",
-      "description": "A2A JSON-RPC 2.0 endpoint"
-    }
-  ],
-  "metadata": {
-    "author": "agenxia",
-    "source_template": null,
-    "type": "template"
+  "api": {
+    "execute": { "type": "post", "description": "Execute workflow" },
+    "status": { "type": "get", "description": "Agent status" }
   }
 }
